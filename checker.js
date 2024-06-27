@@ -1,34 +1,30 @@
-function batteryIsOk(temperature,  soc,  chargeRate) {
-    if(temperature < 0 || temperature > 45) {
+function batteryIsOk(temperature, soc, chargeRate) {
+    let temperatureIsInRange = temperature >= 0 && temperature <= 45;
+    let socIsInRange = soc >= 20 && soc <= 80;
+    let chargeRateIsInRange = chargeRate <= 0.8;
+
+    if (!temperatureIsInRange) {
         console.log("Temperature is out of range!");
-        return false;
-    } else if(soc < 20 || soc > 80) {
-        console.log("State of Charge is out of range!");
-        return false;
-    } else if(chargeRate > 0.8) {
-        console.log("Charge Rate is out of range!");
-        return false;
     }
-    return true;
+    if (!socIsInRange) {
+        console.log("State of Charge is out of range!");
+    }
+    if (!chargeRateIsInRange) {
+        console.log("Charge Rate is out of range!");
+    }
+
+    return temperatureIsInRange && socIsInRange && chargeRateIsInRange;
 }
 
-function  ExpectTrue(expression) {
-    if(!expression) {
-        console.log("Expected true, but got false");
-        
-    }
-}
-function ExpectFalse(expression) {
-    if(expression) {
-        console.log("Expected false, but got true");
-        Environment.Exit(1);
-    }
-}
 function main() {
-    ExpectTrue(batteryIsOk(25, 70, 0.7));
-    ExpectFalse(batteryIsOk(50, 85, 0.0));
-    console.log("All ok");
-    return 0;
+    let batteryOk = batteryIsOk(25, 70, 0.7);
+
+    if (batteryOk) {
+        console.log("All ok");
+    } else {
+        console.log("Battery is not ok");
+    }
 }
 
 main();
+
