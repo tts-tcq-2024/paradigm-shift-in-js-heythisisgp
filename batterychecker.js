@@ -1,7 +1,7 @@
-const { checkTemperature, checkSoc, checkChargeRate } = require('./batteryStatus');
+const { testTemperature, testSocThreshold, testChargeRate } = require('./batterystatusmain');
 
 function batteryIsOk(temperature, soc, chargeRate) {
-    return checkTemperature(temperature) && checkSoc(soc) && checkChargeRate(chargeRate);
+    return testTemperature(temperature) && testSocThreshold(soc) && testChargeRate(chargeRate);
 }
 
 module.exports = batteryIsOk;
