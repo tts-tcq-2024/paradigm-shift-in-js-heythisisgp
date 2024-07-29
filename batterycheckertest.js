@@ -1,4 +1,4 @@
-const batteryIsOk = require('../src/batteryMonitor');
+const batteryIsOk = require('../src/batterychecker');
 
 function ExpectTrue(expression) {
     if (!expression) {
