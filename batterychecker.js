@@ -1,49 +1,25 @@
 let currentLanguage = 'english';
 let translations = {};
 
-function fetchLanguage(lang) {
-  fetch('translations.json')
-    .then(response => response.json())
-    .then(data => {
-      if (data[lang]) {
-        currentLanguage = lang;
-        translations = data;
-      } else {
-        console.error(`Language ${lang} not supported`);
-      }
-    })
-    .catch(error => {
-      console.error('Error loading translations:', error);
-    });
-}
-
-function getTranslation(key) {
-  return translations[currentLanguage][key];
-}
-
-function checkRange(value, min, max) {
-  const checkRange = value >= min && value <= max;
-  if (!checkRange) {
-    console.log(getTranslation(`${value} is out of range!`)); 
+const loadLanguage = async lang => {
+  try {
+    const response = await fetch('translations.json');
+    const data = await response.json();
+    currentLanguage = data[lang] ? lang : currentLanguage;
+    translations = data;
+  } catch (error) {
+    console.error('Error loading translations:', error);
   }
-  return checkRange;
-}
+};
 
-function batteryStatusOK(temperature, soc, chargeRate) {
-  const temperatureIsOk = isInRange(temperature, 0, 45);
-  const socIsOk = isInRange(soc, 20, 80);
-  const chargeRateIsOk = isInRange(chargeRate, 0, 0.8);
+const getTranslation = key => translations[currentLanguage][key] || key;
+const isInRange = (value, min, max, key) => value >= min && value <= max || !console.log(getTranslation(key));
+const batteryIsOk = (temperature, soc, chargeRate) => 
+  isInRange(temperature, 0, 45, 'temperatureOutOfRange') &&
+  isInRange(soc, 20, 80, 'socOutOfRange') &&
+  isInRange(chargeRate, 0, 0.8, 'chargeRateOutOfRange');
 
-  return temperatureIsOk && socIsOk && chargeRateIsOk;
-}
-
-function main() {
-  loadLanguage('german'); 
-  let batteryOk = batteryStatusOK(25, 70, 0.7);
-
-  if (batteryOk) {
-    console.log(getTranslation('allOk'));
-  } else {
-    console.log(getTranslation('batteryNotOk'));
-  }
-}
+(async () => {
+  await loadLanguage('german');
+  console.log(getTranslation(batteryIsOk(25, 70, 0.7) ? 'allOk' : 'batteryNotOk'));
+})();
