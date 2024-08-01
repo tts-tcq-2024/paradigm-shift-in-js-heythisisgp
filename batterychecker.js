@@ -3,7 +3,7 @@ let translations = {};
 
 const loadLanguage = async lang => {
   try {
-    const response = await fetch('translations.json');
+    const response = await fetch('./translations.json');
     const data = await response.json();
     currentLanguage = data[lang] ? lang : currentLanguage;
     translations = data;
