@@ -1,0 +1,16 @@
+{
+  "english": {
+    "temperatureOutOfRange": "Temperature is out of range!",
+    "socOutOfRange": "State of Charge is out of range!",
+    "chargeRateOutOfRange": "Charge Rate is out of range!",
+    "allOk": "All ok",
+    "batteryNotOk": "Battery is not ok"
+  },
+  "german": {
+    "temperatureOutOfRange": "Temperatur außerhalb des Bereichs!",
+    "socOutOfRange": "Ladezustand außerhalb des Bereichs!",
+    "chargeRateOutOfRange": "Ladegeschwindigkeit außerhalb des Bereichs!",
+    "allOk": "Alles in Ordnung",
+    "batteryNotOk": "Batterie ist nicht in Ordnung"
+  }
+}
