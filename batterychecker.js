@@ -1,29 +1,44 @@
 let currentLanguage = 'english';
 let translations = {};
 
-fetch('translations.json')
-  .then(response => response.json())
-  .then(data => {
-    currentLanguage = 'german';
-    translations = data;
-  })
-  .catch(error => console.error('Error loading translations:', error));
-
-function getTranslation(key) {
-  return translations[currentLanguage][key] || key;
+async function loadLanguage(lang) {
+  try {
+    const response = await fetch('translations.json');
+    const data = await response.json();
+    if (data[lang]) {
+      currentLanguage = lang;
+      translations = data[lang]; // Directly assign the language-specific translations
+    } else {
+      console.error(`Language ${lang} not supported`);
+    }
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
 }
 
-function isInRange(value, min, max, key) {
-  return value >= min && value <= max || console.log(getTranslation(key));
+function getTranslation(key) {
+  return translations[key] || `Translation missing for ${key}`; // Provide default value if missing
+}
+
+function isInRange(value, min, max) {
+  const isInRange = value >= min && value <= max;
+  if (!isInRange) {
+    console.log(getTranslation(`${value} is out of range!`));
+  }
+  return isInRange;
 }
 
 function batteryIsOk(temperature, soc, chargeRate) {
-  return isInRange(temperature, 0, 45, 'temperatureOutOfRange') 
-    && isInRange(soc, 20, 80, 'socOutOfRange') 
-    && isInRange(chargeRate, 0, 0.8, 'chargeRateOutOfRange');
+  const temperatureIsOk = isInRange(temperature, 0, 45);
+  const socIsOk = isInRange(soc, 20, 80);
+  const chargeRateIsOk = isInRange(chargeRate, 0, 0.8);
+
+  return temperatureIsOk && socIsOk && chargeRateIsOk;
 }
 
-batteryIsOk(25, 70, 0.7) 
-  ? console.log(getTranslation('allOk')) 
-  : console.log(getTranslation('batteryNotOk'));
+async function main() {
+  await loadLanguage('german');
+  const batteryOk = batteryIsOk(25, 70, 0.7);
 
+  console.log(batteryOk ? getTranslation('allOk') : getTranslation('batteryNotOk'));
+}
