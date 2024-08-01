@@ -1,4 +1,4 @@
-// Define translations for each language
+// Language translations
 const translations = {
   en: {
     temperatureOutOfRange: "Temperature is out of range!",
@@ -18,37 +18,36 @@ const translations = {
   }
 };
 
-// Set the global language variable
+// Global language variable
 let language = 'en'; // or 'de' for German
 
+// Get translation for current language
+const t = translations[language];
+
+// Define validation rules
+const validationRules = [
+  { check: (temperature, soc, chargeRate) => temperature < 0 || temperature > 45, message: t.temperatureOutOfRange },
+  { check: (temperature, soc, chargeRate) => soc < 20 || soc > 80, message: t.socOutOfRange },
+  { check: (temperature, soc, chargeRate) => chargeRate > 0.8, message: t.chargeRateOutOfRange }
+];
+
 function batteryIsOk(temperature, soc, chargeRate) {
-  const translation = translations[language];
-
-  console.log(
-    temperature < 0 || temperature > 45 ? translation.temperatureOutOfRange :
-    soc < 20 || soc > 80 ? translation.socOutOfRange :
-    chargeRate > 0.8 ? translation.chargeRateOutOfRange :
-    translation.allParametersWithinRange
-  );
-
-  let value = ((temperature < 0 || temperature > 45) || (soc < 20 || soc > 80) || (chargeRate > 0.8)) ? false : true;
-  return value;
+  const failedRule = validationRules.find(rule => rule.check(temperature, soc, chargeRate));
+  if (failedRule) {
+    console.log(failedRule.message);
+    return false;
+  }
+  console.log(t.allParametersWithinRange);
+  return true;
 }
 
 function ExpectTrueOrFalse(expression) {
-  const translation = translations[language];
-
-  if (!expression) {
-    console.log(translation.expectedTrueButGotFalse);
-  } else {
-    console.log(translation.expectedFalseButGotTrue);
-  }
+  console.log(expression ? t.expectedFalseButGotTrue : t.expectedTrueButGotFalse);
 }
 
 function main() {
   ExpectTrueOrFalse(batteryIsOk(25, 70, 0.7));
   ExpectTrueOrFalse(batteryIsOk(50, 85, 0.0));
-  console.log(translations[language].allParametersWithinRange);
   return 0;
 }
 
