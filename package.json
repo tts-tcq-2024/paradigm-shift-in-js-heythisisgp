@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jasmine-node spec --verbose",
-    "start": "node checker.js"
+    "start": "node batterychecker.js"
   },
   "author": "venu",
   "license": "ISC"
