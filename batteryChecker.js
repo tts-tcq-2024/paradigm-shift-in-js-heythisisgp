@@ -1,48 +1,94 @@
-// Language translations
-import { translations } from './translations.js';
+// Translation Interface
+class Translation {
+  constructor(translations) {
+    this.translations = translations;
+  }
 
-// Global language variable
-let language = 'eng'; // or 'ger' for German
+  getTranslation(key) {
+    return this.translations[key];
+  }
+}
 
-// Get translation for current language
-const translatedLanguage = translations[language];
+// Validation Interface
+class ValidationRule {
+  constructor(check, message) {
+    this.check = check;
+    this.message = message;
+  }
 
-const validationRules = [
-  { check: isTemperatureOk, message: translatedLanguage.temperatureOutOfRange },
-  { check: isSocOk, message: translatedLanguage.socOutOfRange },
-  { check: isChargeRateOk, message: translatedLanguage.chargeRateOutOfRange }
-];
+  validate(temperature, soc, chargeRate) {
+    return this.check(temperature, soc, chargeRate) 
+      ? { result: true, message: this.message }
+      : { result: false, message: this.message };
+  }
+}
 
-function isTemperatureOk(temperature){
+// Translation implementation
+class TranslationService extends Translation {
+  constructor(translations, language) {
+    super(translations);
+    this.language = language;
+  }
+
+  getCurrentTranslations() {
+    return this.getTranslation(this.language);
+  }
+}
+
+// Validation implementation
+class ValidationService {
+  constructor(translations) {
+    const translatedOutput = translations;
+    this.rules = [
+      new ValidationRule(isTemperatureOk, translatedOutput.temperatureOutOfRange),
+      new ValidationRule(isSocOk, translatedOutput.socOutOfRange),
+      new ValidationRule(isChargeRateOk, translatedOutput.chargeRateOutOfRange)
+    ];
+  }
+
+  validate(temperature, soc, chargeRate) {
+    for (let rule of this.rules) {
+      const result = rule.validate(temperature, soc, chargeRate);
+      if (!result.result) {
+        return result;
+      }
+    }
+    return { result: true, message: translatedOutput.allParametersWithinRange };
+  }
+}
+
+// Helper functions
+function isTemperatureOk(temperature) {
   return temperature >= 0 && temperature <= 45;
 }
 
-function isSocOk(soc){
+function isSocOk(soc) {
   return soc >= 20 && soc <= 80;
 }
 
-function isChargeRateOk(chargeRate){
+function isChargeRateOk(chargeRate) {
   return chargeRate >= 0 && chargeRate <= 0.8;
 }
 
-function batteryIsOk(temperature, soc, chargeRate) {
-  for (let rule of validationRules) {
-    if (!rule.check(temperature, soc, chargeRate)) {
-      return { result: false, message: rule.message };
-    }
-  }
-  return { result: true, message: translatedLanguage.allParametersWithinRange };
-}
+// Main logic
+function main(translations, language) {
+  const translationService = new TranslationService(translations, language);
+  const translatedOutput = translationService.getCurrentTranslations();
+  const validationService = new ValidationService(translatedOutput);
 
-function ExpectTrueOrFalse(expression) {
-  return expression ? translatedLanguage.expectedTrueButGotFalse : translatedLanguage.expectedFalseButGotTrue;
-}
+  const result1 = validationService.validate(25, 70, 0.7);
+  const result2 = validationService.validate(50, 85, 0.0);
 
-function main() {
-  const result1 = batteryIsOk(25, 70, 0.7);
-  const result2 = batteryIsOk(50, 85, 0.0);
   return [result1, result2];
 }
 
-const results = main();
+// Sample translations
+const translations = require('./translations');
+
+// Execute
+const language = 'eng'; // or 'ger' for German
+const results = main(translations, language);
+
+console.log(results);
+
 
