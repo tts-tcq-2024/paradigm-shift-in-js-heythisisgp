@@ -1,6 +1,6 @@
 // Language translations
 const translations = {
-  en: {
+  eng: {
     temperatureOutOfRange: "Temperature is out of range!",
     socOutOfRange: "State of Charge is out of range!",
     chargeRateOutOfRange: "Charge Rate is out of range!",
@@ -8,7 +8,7 @@ const translations = {
     expectedTrueButGotFalse: "Expected true, but got false",
     expectedFalseButGotTrue: "Expected false, but got true"
   },
-  de: {
+  ger: {
     temperatureOutOfRange: "Temperatur ist außerhalb des Bereichs!",
     socOutOfRange: "Ladezustand ist außerhalb des Bereichs!",
     chargeRateOutOfRange: "Ladestrom ist außerhalb des Bereichs!",
@@ -19,23 +19,25 @@ const translations = {
 };
 
 // Global language variable
-let language = 'en'; // or 'de' for German
+let language = 'eng'; // or 'ger' for German
 
 // Get translation for current language
-const t = translations[language];
+const translatedLanguage = translations[language];
 
 const validationRules = [
-  { check: isTemperatureOk, message: t.temperatureOutOfRange },
-  { check: isSocOk, message: t.socOutOfRange },
-  { check: isChargeRateOk, message: t.chargeRateOutOfRange }
+  { check: isTemperatureOk, message: translatedLanguage.temperatureOutOfRange },
+  { check: isSocOk, message: translatedLanguage.socOutOfRange },
+  { check: isChargeRateOk, message: translatedLanguage.chargeRateOutOfRange }
 ];
 
 function isTemperatureOk(temperature){
   return temperature >= 0 && temperature <= 45;
 }
+
 function isSocOk(soc){
   return soc >= 20 && soc <= 80;
 }
+
 function isChargeRateOk(chargeRate){
   return chargeRate >= 0 && chargeRate <= 0.8;
 }
@@ -43,22 +45,21 @@ function isChargeRateOk(chargeRate){
 function batteryIsOk(temperature, soc, chargeRate) {
   for (let rule of validationRules) {
     if (!rule.check(temperature, soc, chargeRate)) {
-      console.log(rule.message);
-      return false;
+      return { result: false, message: rule.message };
     }
   }
-  console.log(t.allParametersWithinRange);
-  return true;
+  return { result: true, message: translatedLanguage.allParametersWithinRange };
 }
 
 function ExpectTrueOrFalse(expression) {
-  console.log(expression ? t.expectedTrueButGotFalse : t.expectedFalseButGotTrue);
+  return expression ? translatedLanguage.expectedTrueButGotFalse : translatedLanguage.expectedFalseButGotTrue;
 }
 
 function main() {
-  ExpectTrueOrFalse(batteryIsOk(25, 70, 0.7));
-  ExpectTrueOrFalse(batteryIsOk(50, 85, 0.0)); 
-  return 0;
+  const result1 = batteryIsOk(25, 70, 0.7);
+  const result2 = batteryIsOk(50, 85, 0.0);
+  return [result1, result2];
 }
 
-main();
+const results = main();
+
