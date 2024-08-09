@@ -24,30 +24,40 @@ let language = 'en'; // or 'de' for German
 // Get translation for current language
 const t = translations[language];
 
-// Define validation rules
 const validationRules = [
-  { check: (temperature, soc, chargeRate) => temperature < 0 || temperature > 45, message: t.temperatureOutOfRange },
-  { check: (temperature, soc, chargeRate) => soc < 20 || soc > 80, message: t.socOutOfRange },
-  { check: (temperature, soc, chargeRate) => chargeRate > 0.8, message: t.chargeRateOutOfRange }
+  { check: isTemperatureOk, message: t.temperatureOutOfRange },
+  { check: isSocOk, message: t.socOutOfRange },
+  { check: isChargeRateOk, message: t.chargeRateOutOfRange }
 ];
 
+function isTemperatureOk(temperature){
+  return temperature >= 0 && temperature <= 45;
+}
+function isSocOk(soc){
+  return soc >= 20 && soc <= 80;
+}
+function isChargeRateOk(chargeRate){
+  return chargeRate >= 0 && chargeRate <= 0.8;
+}
+
 function batteryIsOk(temperature, soc, chargeRate) {
-  const failedRule = validationRules.find(rule => rule.check(temperature, soc, chargeRate));
-  if (failedRule) {
-    console.log(failedRule.message);
-    return false;
+  for (let rule of validationRules) {
+    if (!rule.check(temperature, soc, chargeRate)) {
+      console.log(rule.message);
+      return false;
+    }
   }
   console.log(t.allParametersWithinRange);
   return true;
 }
 
 function ExpectTrueOrFalse(expression) {
-  console.log(expression ? t.expectedFalseButGotTrue : t.expectedTrueButGotFalse);
+  console.log(expression ? t.expectedTrueButGotFalse : t.expectedFalseButGotTrue);
 }
 
 function main() {
   ExpectTrueOrFalse(batteryIsOk(25, 70, 0.7));
-  ExpectTrueOrFalse(batteryIsOk(50, 85, 0.0));
+  ExpectTrueOrFalse(batteryIsOk(50, 85, 0.0)); 
   return 0;
 }
 
